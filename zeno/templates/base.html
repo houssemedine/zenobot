@@ -1,0 +1,56 @@
+{% load static %}
+
+
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- menu css  -->
+    <link href="{% static 'css/menu.css' %}" rel="stylesheet">
+    <!-- search css  -->
+    <link href="{% static 'css/search.css' %}" rel="stylesheet">
+    <!-- cards css  -->
+    <link href="{% static 'css/card.css' %}" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+
+    <title>Zeno</title>
+</head>
+<body>
+    <div style="display: flex;justify-content: space-between;align-items: center;margin-top: 29px;margin-left: 10px;margin-right: 10px;margin-bottom: 30px;">
+            <img src="{% static 'img/Zeno_logo.png' %}" alt="" style="height: 60px;">
+            
+            <ul class="menu-bar">
+                <a class="heading__link" href="{% url 'zenohome' %}"><li>Home</li></a>
+                <li>Useful link</li>
+                <li>Best practices</li>
+                <li>Tools</li>
+                <a class="heading__link" href="{% url 'zenohome' %}"><li>About</li></a>
+
+            </ul>        
+            <img src="{% static 'img/Latecoere_logo.png' %}" alt="" style="height: 30px;">
+        </div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+{% block content %}
+{% endblock %}
