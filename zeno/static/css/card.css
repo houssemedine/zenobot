@@ -101,11 +101,14 @@ body {
   grid-row: 3/4;
   font-weight: 400;
   color: #ffffff;
+  margin-top: 10px;
+
 }
 
 .card__apply {
   grid-row: 4/5;
-  align-self: center;
+  /* align-self: left; */
+  align-self: flex-start;
 }
 
 /* CARD BACKGROUNDS */
