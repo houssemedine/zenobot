@@ -1,6 +1,7 @@
 .note{
-    background-color: #fff;
+    background-color: var(--bs-gray-100);
 	border-left: 0.7rem solid #007bff;
 	margin: 1.5em 0.7rem;
 	padding: 0.5em 0.7rem;
+	font-family: 'Ubuntu';
 }

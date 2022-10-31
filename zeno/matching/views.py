@@ -17,14 +17,12 @@ def traitement(request):
 
         df=pd.read_csv( zpp_file,sep='\t', encoding='utf-16le',names=['A','Article','Date', 'D', 'Elém. MRP','Don. élém.plan.', 'MsEx', 'Entr/bes.', 'Qté disp.','Date réord','Fourn.','Client','UQ Base','Qté Unité de saisie','Unité de saisie'])
 
-        print(df)
         ######################################
         #
         #Start Cleaning Data
         #
         #######################################
         df=df[~df['Article'].isna() & df['Article'].str.startswith('IS')]
-        print(df)
         # Get Action type based on Elém. MRP 
         df['action_type']=np.where(df['Elém. MRP'].isin(['OF','ORDPLA']), 'order','')
         df['action_type']=np.where(df['Elém. MRP']=="CDECLI", 'cmd',df['action_type'])
@@ -99,16 +97,48 @@ def traitement(request):
         #Get original data 
         dict_cmd_qte=dict(zip(df['Don. élém.plan.'],df['Entr/bes.']))
         dict_cmd_date=dict(zip(df['Don. élém.plan.'],df['Date']))
+        #Cleaning Table
         df_order['intial_cmd_needs']=df_order['cmd'].map(dict_cmd_qte)
         df_order['intial_cmd_date']=df_order['cmd'].map(dict_cmd_date)
-        # df_cmd['Don. élém.plan.']=df_cmd['Don. élém.plan.'].str.split('/').str[0]
+        df_order['Poste Besoin']=df_order['cmd'].str.split('/').str[1]
+        df_order['Poste Besoin']=df_order['Poste Besoin'].str.lstrip('0')
+        df_order['Don. élém.plan.']=df_order['Don. élém.plan.'].str.split('/').str[0]
+        df_order['cmd']=df_order['cmd'].str.split('/').str[0]
+        df_order['Don. élém.plan.']=df_order['Don. élém.plan.'].str.lstrip('0')
+        df_order['cmd']=df_order['cmd'].str.lstrip('0')
 
+        df_order['action_date']=pd.to_datetime(df_order['action_date']).dt.strftime('%d/%m/%Y')
+        df_order['date_cmd']=pd.to_datetime(df_order['date_cmd']).dt.strftime('%d/%m/%Y')
 
-        # Download to csv 
-        # response = HttpResponse(content_type='text/csv')
-        # response['Content-Disposition'] = 'attachment; filename=matching_wo_command.csv'
+        del df_order['index']
+        del df_order['A']
+        del df_order['D']
+        del df_order['Qté disp.']
+        del df_order['Fourn.']
+        del df_order['Client']
+        del df_order['Qté Unité de saisie']
+        del df_order['Unité de saisie']
+        del df_order['key']
+        del df_order['action_type']
 
-        # df_order.to_csv(path_or_buf=response,index=False)
+        df=df_order.rename(columns={
+            'Date'	    : 'Date Format SAP' ,
+            'Elém. MRP'	: 'Elément MRP' ,
+            'Don. élém.plan.' :	'Elément Planification (OP/OF)' ,
+            'MsEx'	 : 'MEXEP' ,
+            'Entr/bes.' : 	'Qté OF' ,
+            'Date réord'	: 'Date de réordo' ,
+            'UQ Base' : 	'Unité de Base' ,
+            'action_date': 	'Date Elément' ,
+            'cmd': 	'Besoin (Cmd / Livr / BIP …)' ,
+            'date_cmd': 	'Date Besoin' ,
+            'element_type': 	'Besoin Type' ,
+            'intial_cmd_needs': 	'Qté Besoin' ,
+            'intial_cmd_date': 	'Date Besoin format SAP' ,
+
+            },inplace=True)
+        
+
         with BytesIO() as b:
         # Use the StringIO object as the filehandle.
             writer = pd.ExcelWriter(b, engine='xlsxwriter')
@@ -122,6 +152,6 @@ def traitement(request):
             )
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
-        # return response
+
 
     
