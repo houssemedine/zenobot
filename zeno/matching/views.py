@@ -25,6 +25,7 @@ def traitement(request):
         df=df[~df['Article'].isna() & df['Article'].str.startswith('IS')]
         # Get Action type based on Elém. MRP 
         df['action_type']=np.where(df['Elém. MRP'].isin(['OF','ORDPLA']), 'order','')
+        df['action_type']=np.where(df['Elém. MRP'].isin(['CDECLI','BES.IN']), 'cmd',df['action_type'])
         df['action_type']=np.where(df['Elém. MRP']=="CDECLI", 'cmd',df['action_type'])
         df['action_type']=np.where(df['Elém. MRP']=="Stock", 'a_stock',df['action_type'])
         df['action_type']=np.where(df['Elém. MRP']=="STKMAG", 'z_STKMAG',df['action_type'])
@@ -91,6 +92,7 @@ def traitement(request):
                     df_order.loc[i,'date_cmd']=df_cmd.loc[j,'action_date']
                     df_order.loc[i,'element_type']=df_cmd.loc[j,'Elém. MRP']
 
+                    break
         #refine the display of cmd : if duplicate keep one line
         # df_order['cmd'] = df_order['cmd'].mask(df_order['cmd'].ne(df_order['cmd'].shift()).cumsum().duplicated(), '')
 
