@@ -3,6 +3,8 @@ from io import BytesIO
 from django.http import HttpResponse
 import pandas as pd
 import numpy as np
+from datetime import timedelta
+
 
 
 
@@ -87,8 +89,11 @@ def traitement(request):
         df_buffer_performed=df[df['buffer_performed']==True]
 
 
-        df_buffer_planned['buffer_planned_day']= df_buffer_planned['ODD Customer'] - df_buffer_planned['PLANED MADLOG']
-        df_buffer_performed['buffer_performed_day']= df_buffer_performed['ODD Customer'] - df_buffer_performed['PERFORMED MADLOG']
+        # df_buffer_planned['buffer_planned_day']= df_buffer_planned['ODD Customer'] - df_buffer_planned['PLANED MADLOG']
+        df_buffer_planned['buffer_planned_day'] = df_buffer_planned.apply(lambda x: diff_date(x['ODD Customer'] , x['PLANED MADLOG']),axis=1)
+        # df_buffer_performed['buffer_performed_day']= df_buffer_performed['ODD Customer'] - df_buffer_performed['PERFORMED MADLOG']
+        df_buffer_performed['buffer_performed_day'] = df_buffer_performed.apply(lambda x: diff_date(x['ODD Customer'] , x['PERFORMED MADLOG']),axis=1)
+
 
         buffer_planned_day = df_buffer_planned.groupby("planned_madlog_period")["buffer_planned_day"].mean().reset_index()
         buffer_performed_day = df_buffer_performed.groupby("planned_madlog_period")["buffer_performed_day"].mean().reset_index()
@@ -124,3 +129,37 @@ def traitement(request):
             )
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
+
+
+def diff_date(reordo,available):
+
+    diff=0
+    if reordo is None:
+        diff=0
+    else:
+        if reordo < available:
+            delta=available-reordo
+            for i in range(delta.days):
+                day = reordo + timedelta(days=i)
+                if day.weekday()>4: 
+                        # if a weekend or  holiday, skip
+                        continue
+                else:
+                    # if a workday, count as a day
+                    diff+= 1
+        else:
+            delta = reordo - available       # as timedelta
+            for i in range(delta.days):
+                day = available + timedelta(days=i)
+ 
+                if day.weekday()>4: 
+                        # if a weekend or  holiday, skip
+                        continue
+                else:
+                    # if a workday, count as a day
+                    diff+= 1
+
+
+        if reordo < available:
+            diff= diff*(-1)
+    return diff
