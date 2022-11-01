@@ -75,27 +75,41 @@ def traitement(request):
         table = pd.pivot_table(result, values=0, index=['period'],
                             columns=['type'], aggfunc=np.sum).reset_index()
 
+        # Gap Calucluation 
         table['gap_liv']=table['performed_liv'] - table['planned_liv']
         table['gap_madlog']=table['performed_madlog'] - table['planned_madlog']
 
 
-        df['buffer_planned_msn']=np.where( ~(df['planned_madlog_period'] == df['planned_liv_period']),True,False)
-        df['buffer_performed_msn']=np.where( ~(df['performed_madlog_period'] == df['performed_liv_period']),True,False)
+        df['buffer_planned']=np.where( ~(df['planned_madlog_period'] == df['planned_liv_period']),True,False)
+        df['buffer_performed']=np.where( ~(df['performed_madlog_period'] == df['performed_liv_period']),True,False)
 
-        df_buffer_planned_msn=df[df['buffer_planned_msn']==True]
-        df_buffer_performed_msn=df[df['buffer_performed_msn']==True]
-        buffer_planned_msn=df_buffer_planned_msn.groupby("planned_madlog_period")["buffer_planned_msn"].count().reset_index()
-        buffer_performed_msn=df_buffer_performed_msn.groupby("planned_madlog_period")["buffer_performed_msn"].count().reset_index()
+        df_buffer_planned=df[df['buffer_planned']==True]
+        df_buffer_performed=df[df['buffer_performed']==True]
 
-        buffer_planned_msn_dict=dict(zip(buffer_planned_msn['planned_madlog_period'],buffer_planned_msn['buffer_planned_msn']))
-        buffer_performed_msn_dict=dict(zip(buffer_performed_msn['planned_madlog_period'],buffer_performed_msn['buffer_performed_msn']))
+
+        df_buffer_planned['buffer_planned_day']= df_buffer_planned['ODD Customer'] - df_buffer_planned['PLANED MADLOG']
+        df_buffer_performed['buffer_performed_day']= df_buffer_performed['ODD Customer'] - df_buffer_performed['PERFORMED MADLOG']
+
+        buffer_planned_day = df_buffer_planned.groupby("planned_madlog_period")["buffer_planned_day"].mean().reset_index()
+        buffer_performed_day = df_buffer_performed.groupby("planned_madlog_period")["buffer_performed_day"].mean().reset_index()
+        buffer_planned_day_dict=dict(zip(buffer_planned_day['planned_madlog_period'],buffer_planned_day['buffer_planned_day']))
+        buffer_performed_day_dict=dict(zip(buffer_performed_day['planned_madlog_period'],buffer_performed_day['buffer_performed_day']))
+
+
+        buffer_planned_msn=df_buffer_planned.groupby("planned_madlog_period")["buffer_planned"].count().reset_index()
+        buffer_performed_msn=df_buffer_performed.groupby("planned_madlog_period")["buffer_performed"].count().reset_index()
+
+        buffer_planned_msn_dict=dict(zip(buffer_planned_msn['planned_madlog_period'],buffer_planned_msn['buffer_planned']))
+        buffer_performed_msn_dict=dict(zip(buffer_performed_msn['planned_madlog_period'],buffer_performed_msn['buffer_performed']))
 
         table['buffer_planned_msn']=table['period'].map(buffer_planned_msn_dict)
         table['buffer_performed_msn']=table['period'].map(buffer_performed_msn_dict)
+        table['buffer_planned_day']=table['period'].map(buffer_planned_day_dict)
+        table['buffer_performed_day']=table['period'].map(buffer_performed_day_dict)
 
 
 
-        # table.to_excel(r'C:\Users\L0005082\Documents\Projets\rim\table2.xlsx')
+        # df_buffer_performed.to_excel(r'C:\Users\L0005082\Documents\Projets\rim\df_buffer_performed.xlsx')
 
         with BytesIO() as b:
         # Use the StringIO object as the filehandle.
