@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<form action="{% url 'buffertraitement' %}" method="POST" class="form-container" enctype='multipart/form-data'>
+<form action="{% url 'matchingtraitement' %}" method="POST" class="form-container" enctype='multipart/form-data'>
     {% csrf_token %}
 	<div class="upload-files-container">
 		<div class="drag-file-area">
