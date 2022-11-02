@@ -10,7 +10,7 @@ from datetime import timedelta
 
 
 def home(request):
-    return render(request,'matching/index.html')
+    return render(request,r'buffer\home.html')
 
 
 
@@ -95,8 +95,8 @@ def traitement(request):
         df_buffer_performed['buffer_performed_day'] = df_buffer_performed.apply(lambda x: diff_date(x['ODD Customer'] , x['PERFORMED MADLOG']),axis=1)
 
 
-        buffer_planned_day = df_buffer_planned.groupby("planned_madlog_period")["buffer_planned_day"].mean().reset_index()
-        buffer_performed_day = df_buffer_performed.groupby("planned_madlog_period")["buffer_performed_day"].mean().reset_index()
+        buffer_planned_day = df_buffer_planned.groupby("planned_madlog_period")["buffer_planned_day"].mean().round(0) .reset_index()
+        buffer_performed_day = df_buffer_performed.groupby("planned_madlog_period")["buffer_performed_day"].mean().round(0) .reset_index()
         buffer_planned_day_dict=dict(zip(buffer_planned_day['planned_madlog_period'],buffer_planned_day['buffer_planned_day']))
         buffer_performed_day_dict=dict(zip(buffer_performed_day['planned_madlog_period'],buffer_performed_day['buffer_performed_day']))
 
@@ -112,7 +112,34 @@ def traitement(request):
         table['buffer_planned_day']=table['period'].map(buffer_planned_day_dict)
         table['buffer_performed_day']=table['period'].map(buffer_performed_day_dict)
 
-
+        #Cleaning
+        #Rename
+        table.rename ( columns={
+            'performed_liv':'Nbr MSN performed LIV',
+            'performed_madlog':'Nbr MSN performed MADLOG',
+            'planned_liv':'Nbr MSN planned LIV',
+            'planned_madlog':'Nbr MSN planned madlog',
+            'buffer_planned_msn':'Buffer planned MADLOG per msn',
+            'buffer_performed_msn':'Buffer performed MADLOG per msn',
+            'buffer_planned_day':'Buffer planned MADLOG per day',
+            'buffer_performed_day':'Buffer performed MADLOG per day'},
+            inplace=True )
+        #Ordring
+        table=table.loc[:, ["period",
+                    "Nbr MSN planned madlog",
+                    "Nbr MSN performed MADLOG",
+                    "gap_madlog",
+                    "Nbr MSN planned LIV",
+                    "Nbr MSN performed LIV",
+                    "gap_liv",
+                    "Buffer planned MADLOG per msn",
+                    "Buffer performed MADLOG per msn",	
+                    "Buffer planned MADLOG per day"	,
+                    "Buffer performed MADLOG per day"
+                    ]]
+        table.drop([0], axis=0, inplace=True)
+        table['period'] = table['period'].apply(lambda x: str(x[:4]) + '_' + str(x[4:]))
+        table=table.fillna(0)
 
         # df_buffer_performed.to_excel(r'C:\Users\L0005082\Documents\Projets\rim\df_buffer_performed.xlsx')
 
@@ -122,7 +149,7 @@ def traitement(request):
             table.to_excel(writer, sheet_name='Sheet1')
             writer.save()
             # Set up the Http response.
-            filename = 'matching_wo_command.xlsx'
+            filename = 'buffer.xlsx'
             response = HttpResponse(
                 b.getvalue(),
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
