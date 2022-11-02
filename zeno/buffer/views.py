@@ -162,4 +162,4 @@ def diff_date(reordo,available):
 
         if reordo < available:
             diff= diff*(-1)
-    return diff
+    return diff+1
