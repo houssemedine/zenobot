@@ -21,5 +21,6 @@ urlpatterns = [
     path('zeno/', TemplateView.as_view(template_name='index.html'),name='zenohome'),
     path('zeno/matching/', include('matching.urls')),  
     path('zeno/buffer/', include('buffer.urls')),  
+    path('zeno/exchange/', include('exchange.urls')),  
 
 ]

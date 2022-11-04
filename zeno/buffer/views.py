@@ -10,7 +10,7 @@ from datetime import timedelta
 
 
 def home(request):
-    return render(request,r'buffer\home.html')
+    return render(request,r'buffer\index.html')
 
 
 

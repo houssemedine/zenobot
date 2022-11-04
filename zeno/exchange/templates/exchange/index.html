@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<form action="{% url 'exchangetraitement' %}" method="POST">
+    {% csrf_token %}
+    <center><button type="submit" class="upload-button"> Upload </button></center>
+</form>
+
+
+
+{% endblock %}
