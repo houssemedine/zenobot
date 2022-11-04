@@ -71,15 +71,16 @@
           <a class="card__link" href="{% url 'bufferhome' %}">Try Now <i class="fas fa-arrow-right"></i></a>
         </p>
       </div>
-            <!--
-      <div class="card card-5">
-        <div class="card__icon"><i class="fas fa-bolt"></i></div>
-        <p class="card__exit"><i class="fas fa-times"></i></p>
-        <h2 class="card__title">Ut aliquip ex ea commodo consequat. Duis aute irure dolor.</h2>
+            
+      <div class="card card-5 hidden" id="buffer" data-content="all * exchange rate conversion euro sap tcurr">
+        <div class="card__icon"><i class="fas fa-bolt"></i> Exchange</div>
+        {% comment %} <p class="card__exit"><i class="fas fa-times"></i> </p> {% endcomment %}
+        <p class="card__title">Get last exchange rate from SAP</p>
         <p class="card__apply">
-          <a class="card__link" href="#">Apply Now <i class="fas fa-arrow-right"></i></a>
+          <a class="card__link" href="#">Try Now <i class="fas fa-arrow-right"></i></a>
         </p>
       </div>
+      <!--
       <div class="card card-1">
         <div class="card__icon"><i class="fas fa-bolt"></i></div>
         <p class="card__exit"><i class="fas fa-times"></i></p>

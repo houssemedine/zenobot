@@ -1,0 +1,14 @@
+from django.shortcuts import render
+
+# Create your views here.
+
+
+def home(request):
+    return render(request,'exchange\index.html')
+
+
+def traitement(request):
+
+
+    
+    return True

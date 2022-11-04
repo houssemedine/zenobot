@@ -88,11 +88,14 @@ def traitement(request):
         df_buffer_planned=df[df['buffer_planned']==True]
         df_buffer_performed=df[df['buffer_performed']==True]
 
-
-        # df_buffer_planned['buffer_planned_day']= df_buffer_planned['ODD Customer'] - df_buffer_planned['PLANED MADLOG']
-        df_buffer_planned['buffer_planned_day'] = df_buffer_planned.apply(lambda x: diff_date(x['ODD Customer'] , x['PLANED MADLOG']),axis=1)
-        # df_buffer_performed['buffer_performed_day']= df_buffer_performed['ODD Customer'] - df_buffer_performed['PERFORMED MADLOG']
-        df_buffer_performed['buffer_performed_day'] = df_buffer_performed.apply(lambda x: diff_date(x['ODD Customer'] , x['PERFORMED MADLOG']),axis=1)
+        if df_buffer_planned.empty:
+            df_buffer_planned['buffer_planned_day']=0
+        else:
+            df_buffer_planned['buffer_planned_day'] = df_buffer_planned.apply(lambda x: diff_date(x['ODD Customer'] , x['PLANED MADLOG']),axis=1)
+        if df_buffer_performed.empty:
+            df_buffer_performed['buffer_performed_day'] = 0
+        else:
+            df_buffer_performed['buffer_performed_day'] = df_buffer_performed.apply(lambda x: diff_date(x['ODD Customer'] , x['PERFORMED MADLOG']),axis=1)
 
 
         buffer_planned_day = df_buffer_planned.groupby("planned_madlog_period")["buffer_planned_day"].mean().round(0) .reset_index()
