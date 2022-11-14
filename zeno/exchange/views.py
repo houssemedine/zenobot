@@ -5,11 +5,25 @@ import pandas as pd
 from io import BytesIO
 from django.http import HttpResponse
 from datetime import date
+import time
 # Create your views here.
 
 
 def home(request):
-    return render(request,'exchange\index.html')
+    directory_t001=glob.glob(r"\\centaure\Extract_SAP\SE16N-T001\*")
+    t001_file= max(directory_t001,key=os.path.getmtime)
+    t001_date=  time.ctime(os.path.getmtime (t001_file))
+
+    directory_t001k=glob.glob(r"\\centaure\Extract_SAP\SE16N-T001K\*")
+    t001k_file= max(directory_t001k,key=os.path.getmtime)
+    t001k_date=  time.ctime(os.path.getmtime (t001k_file))
+
+
+    directory_tcurr=glob.glob(r"\\centaure\Extract_SAP\SE16N-TCURR\*")
+    tcurr_file=max(directory_tcurr,key=os.path.getmtime)
+    tcurr_date=  time.ctime(os.path.getmtime (tcurr_file))
+
+    return render(request,'exchange\index.html',{'t001_date':t001_date,'t001k_date':t001k_date,'tcurr_date':tcurr_date})
 
 
 def traitement(request):

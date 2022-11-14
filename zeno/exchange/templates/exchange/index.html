@@ -2,10 +2,28 @@
 {% load static %}
 
 {% block content %}
+<div>
+	<blockquote class='note'>
+		<h3><i class="fa-solid fa-circle-info" style="color: var(--bs-blue) ;"></i></h3>
+		Based on last update of files extract T001, T001K, TCURR from SAP, you can download last update of exchange rate.
+        <ul>
+            <li>Last UPDATE:</li>
+            <ul>
+                <li>T001 : {{t001_date}} </li>
+                <li>T001K : {{t001k_date}} </li>
+                <li>TCURR : {{tcurr_date}} </li>
+            </ul>
+        </ul>
+        
+		<br>
+		<br>
+		<small><i class="fa-solid fa-signature"></i> <i>Zeno</i></small>
+	</blockquote>
 
+</div>
 <form action="{% url 'exchangetraitement' %}" method="POST">
     {% csrf_token %}
-    <center><button type="submit" class="upload-button"> Upload </button></center>
+    <center><button type="submit" class="upload-button"> Download </button></center>
 </form>
 
 
