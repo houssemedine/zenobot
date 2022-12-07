@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'main',
+
     'matching',
     'buffer',
     'exchange',
@@ -80,8 +82,14 @@ WSGI_APPLICATION = 'zeno.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'zeno_db',
+        'USER': 'postgres',
+        'PASSWORD': '054Ibiza',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

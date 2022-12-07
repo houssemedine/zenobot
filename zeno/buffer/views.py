@@ -87,6 +87,7 @@ def traitement(request):
 
         df_buffer_planned=df[df['buffer_planned']==True]
         df_buffer_performed=df[df['buffer_performed']==True]
+        df_buffer_performed_liv=df[~(df['performed_liv_period']  == "00" )]
 
         if df_buffer_planned.empty:
             df_buffer_planned['buffer_planned_day']=0
@@ -96,24 +97,33 @@ def traitement(request):
             df_buffer_performed['buffer_performed_day'] = 0
         else:
             df_buffer_performed['buffer_performed_day'] = df_buffer_performed.apply(lambda x: diff_date(x['ODD Customer'] , x['PERFORMED MADLOG']),axis=1)
+        df_buffer_performed_liv['buffer_performed_liv_day'] = df_buffer_performed_liv.apply(lambda x: diff_date(x['ODD Customer'] , x['PERFORMED LIV']),axis=1)
 
 
         buffer_planned_day = df_buffer_planned.groupby("planned_madlog_period")["buffer_planned_day"].mean().round(0) .reset_index()
         buffer_performed_day = df_buffer_performed.groupby("planned_madlog_period")["buffer_performed_day"].mean().round(0) .reset_index()
+
+        buffer_performed_liv_day = df_buffer_performed_liv.groupby("performed_liv_period")["buffer_performed_liv_day"].mean().round(0) .reset_index()
+        advance_delay = df_buffer_performed_liv.groupby("performed_liv_period")["Avance/retard"].mean().round(0) .reset_index()
+
         buffer_planned_day_dict=dict(zip(buffer_planned_day['planned_madlog_period'],buffer_planned_day['buffer_planned_day']))
         buffer_performed_day_dict=dict(zip(buffer_performed_day['planned_madlog_period'],buffer_performed_day['buffer_performed_day']))
+        buffer_performed_liv_day_dict=dict(zip(buffer_performed_liv_day['performed_liv_period'],buffer_performed_liv_day['buffer_performed_liv_day']))
+        advance_delay_dict=dict(zip(advance_delay['performed_liv_period'],advance_delay['Avance/retard']))
 
 
         buffer_planned_msn=df_buffer_planned.groupby("planned_madlog_period")["buffer_planned"].count().reset_index()
-        buffer_performed_msn=df_buffer_performed.groupby("planned_madlog_period")["buffer_performed"].count().reset_index()
+        buffer_performed_msn=df_buffer_performed.groupby("performed_madlog_period")["buffer_performed"].count().reset_index()
 
         buffer_planned_msn_dict=dict(zip(buffer_planned_msn['planned_madlog_period'],buffer_planned_msn['buffer_planned']))
-        buffer_performed_msn_dict=dict(zip(buffer_performed_msn['planned_madlog_period'],buffer_performed_msn['buffer_performed']))
+        buffer_performed_msn_dict=dict(zip(buffer_performed_msn['performed_madlog_period'],buffer_performed_msn['buffer_performed']))
 
         table['buffer_planned_msn']=table['period'].map(buffer_planned_msn_dict)
         table['buffer_performed_msn']=table['period'].map(buffer_performed_msn_dict)
         table['buffer_planned_day']=table['period'].map(buffer_planned_day_dict)
         table['buffer_performed_day']=table['period'].map(buffer_performed_day_dict)
+        table['buffer_performed_liv_day']=table['period'].map(buffer_performed_liv_day_dict)
+        table['advance_delay_odd']=table['period'].map(advance_delay_dict)
 
         #Cleaning
         #Rename
@@ -125,7 +135,10 @@ def traitement(request):
             'buffer_planned_msn':'Buffer planned MADLOG per msn',
             'buffer_performed_msn':'Buffer performed MADLOG per msn',
             'buffer_planned_day':'Buffer planned MADLOG per day',
-            'buffer_performed_day':'Buffer performed MADLOG per day'},
+            'buffer_performed_day':'Buffer performed MADLOG per day',
+            'buffer_performed_liv_day':'Buffer performed LIV per day',
+            'advance_delay_odd':'Advance delay ODD',
+            },
             inplace=True )
         #Ordring
         table=table.loc[:, ["period",
@@ -138,7 +151,9 @@ def traitement(request):
                     "Buffer planned MADLOG per msn",
                     "Buffer performed MADLOG per msn",	
                     "Buffer planned MADLOG per day"	,
-                    "Buffer performed MADLOG per day"
+                    "Buffer performed MADLOG per day",
+                    "Buffer performed LIV per day",
+                    "Advance delay ODD",
                     ]]
         table.drop([0], axis=0, inplace=True)
         table['period'] = table['period'].apply(lambda x: str(x[:4]) + '_' + str(x[4:]))
@@ -162,9 +177,10 @@ def traitement(request):
 
 
 def diff_date(reordo,available):
-
     diff=0
-    if reordo is None:
+    if pd.isnull(reordo) is None:
+        diff=0
+    if pd.isnull(available):
         diff=0
     else:
         if reordo < available:
@@ -181,7 +197,7 @@ def diff_date(reordo,available):
             delta = reordo - available       # as timedelta
             for i in range(delta.days):
                 day = available + timedelta(days=i)
- 
+
                 if day.weekday()>4: 
                         # if a weekend or  holiday, skip
                         continue

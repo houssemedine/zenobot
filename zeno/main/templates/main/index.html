@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+    
+
+
+<center>
+    <div class="logo">
+        <img src="{% static 'img/bot.jpg' %}" alt="" style="height: 270px;margin-left: 130px;">
+    </div>
+    <form action="{% url 'zenohome' %}" method="post">
+        {% csrf_token %}
+        <div class="bar">
+            <i type="submit" id="search"  class="fa-solid fa-magnifying-glass" style="cursor: pointer;"></i>
+            <input class="searchbar" type="search" title="Search" id="input_search" required name="input_search" autofocus="autofocus" placeholder="Just tell me here what you want!" style="margin-left: 10px;font-family: 'Ubuntu', sans-serif" value="{{input_search}}">
+        </div>
+    </form>
+</center>
+
+<div class="tooltip">Hover over me
+    <span class="tooltiptext">Tooltip text</span>
+  </div>
+
+<nav class="navMenu">
+    <a href="{% url 'zenohome'  %}"  id="all" {% if input_type == 'all'  %} style="color: #febd17 ;" {% endif %}><i class="fa-regular fa-bookmark"></i> All</a>
+    <a href="{% url 'zenohome'  %}" id="doc" {% if input_type == 'Document' %} style="color: #febd17 ;" {% endif %}><i class="fa-regular fa-file-lines"></i> Document</a>
+    <a href="{% url 'zenohome'  %}" id="video" {% if input_type == 'Video' %} style="color: #febd17 ;" {% endif %}><i class="fa-solid fa-video"></i> Video</a>
+    <a href="{% url 'zenohome'  %}" id="tool" {% if input_type == 'Tool' %} style="color: #febd17 ;" {% endif %}><i class="fa-solid fa-screwdriver-wrench"></i> Tool</a>
+    <a href="{% url 'zenohome'  %}" id="intranet_link" id="tool" {% if input_type == 'Intranet Link' %} style="color: #febd17 ;" {% endif %}><i class="fa-solid fa-link"></i> Intranet Link</a>
+    <div class="dot"></div>
+</nav>
+<hr style="margin-top: 58.5px;">
+
+
+<div class="main-container">
+    <div class="heading" id="heading">
+        {% if count == 0 %}
+            <p class="heading__credits">
+                <a class="heading__link" target="_blank" href="">
+                There are no results that match your search.
+            </a>
+            <ul style="display: flex;align-items: baseline;flex-direction: column;">
+                <b>Suggestions:</b>   
+                <li>Make sure that all words are spelled correctly.</li>
+                <li>Try different keywords.</li>
+                <li>Try more general keywords.</li>
+            </ul>
+            </p>
+            <img src="{% static 'img/notfound.gif' %}" alt="" style="margin-top: -128px;">
+
+
+        {% endif %}
+
+        <!-- <h1 class="heading__title">Suggestions</h1> -->
+        {% if count > 0 %}
+            <a class="heading__link" target="_blank" href="">
+                About {{count}} results in {{total_time|floatformat:4}} seconds
+            </a>
+            <p class="heading__credits">
+                <a class="heading__link" target="_blank" href="">
+                    If you don't see what you are looking for, try again or contact the key user.
+                </a>
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="cards" >
+        {% for element in elements%}
+        <div class="card card-{{element.type}}" id="matching_wo_command" data-content="{{element.tag}}" data-type="{{element.type}}" style="width: 400px;">
+            <div class="card__icon" style="display: flex;justify-content: space-between;align-items: baseline;">
+                {{element.name}}
+
+                {% if element.type == 'Document' %}
+                <i class="fa-regular fa-file-lines"></i> 
+                {% endif %}
+                {% if element.type == 'Video' %}
+                <i class="fa-solid fa-video"></i> 
+                {% endif %}
+                {% if element.type == 'Tool' %}
+                <i class="fa-solid fa-screwdriver-wrench"></i> 
+                {% endif %}
+                {% if element.type == 'Intranet Link' %}
+                <i class="fa-solid fa-link"></i>
+                {% endif %}
+            </div>
+            <p class="card__exit">{{element.type}}</p>
+            <p class="card__title">{{element.description}}</p>
+            <p class="card__apply">
+            <a class="card__link" href="{{element.link}}" target="_blank">Try Now <i class="fas fa-arrow-right"></i></a>
+            <!--    con = The Container for items -->
+
+            </p>
+
+            
+            <div class="card__icon" style="display: flex;justify-content: space-between;align-items: baseline;margin-left: 90%;">
+                <div class="con">
+                    <div class="con-tooltip top">
+                        <i class="fa-solid fa-tags"></i>
+                        <div class="tooltip ">
+                        <p>Tags: {{element.tag}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    let all = document.querySelector("#all");
+    let doc = document.querySelector("#doc");
+    let video = document.querySelector("#video");
+    let tool = document.querySelector("#tool");
+    let intranet_link = document.querySelector("#intranet_link");
+
+    all.href+='?q={{input_search}}&cat=all';
+    doc.href+='?q={{input_search}}&cat=Document';
+    video.href+='?q={{input_search}}&cat=Video';
+    tool.href+='?q={{input_search}}&cat=Tool';
+    intranet_link.href+='?q={{input_search}}&cat=Intranet Link';
+
+    console.log(intranet_link);
+
+</script>
+
+{% endblock %}

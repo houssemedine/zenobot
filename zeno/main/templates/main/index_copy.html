@@ -1,0 +1,38 @@
+
+<script>
+
+
+    const btn = document.querySelector("#search");
+    const input_search = document.querySelector("#input_search");
+    const heading = document.querySelector("#heading");
+    input_search.addEventListener("keypress", function(event) {
+    
+    if (event.key === "Enter") {
+        event.preventDefault();
+        btn.click();
+    }
+    });
+
+    btn.addEventListener('click', function(e) {
+    resetAllDivs();
+    const allWords =input_search.value.split(' ');
+
+    allWords.forEach(findWord)
+    })
+
+    function findWord(w) {
+    const allDivs = document.querySelectorAll(`div[data-content*='${w}']`);
+    heading.classList.remove('hidden')
+    allDivs.forEach(showDiv)
+    }
+
+    function showDiv(node) {
+    node.classList.remove('hidden')
+    }
+
+    function resetAllDivs() {
+    const allDivs = document.querySelectorAll(`div[data-content]`);
+    allDivs.forEach(div => div.classList.add('hidden'));
+    }
+
+</script>
